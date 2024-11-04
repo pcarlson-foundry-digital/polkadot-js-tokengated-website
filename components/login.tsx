@@ -103,7 +103,7 @@ export default function LoginButton() {
                 <p className={inter.className}>
                   Click here to sign in with your selected account and check if you can view the
                   tokengated content. <br></br>
-                  You need &gt; 1 KSM free balance.
+                  You need &gt; 1 TAO free balance.
                 </p>
               </div>
             )}

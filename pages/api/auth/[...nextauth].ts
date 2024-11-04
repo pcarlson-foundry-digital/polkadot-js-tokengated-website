@@ -8,13 +8,13 @@ import { BN } from '@polkadot/util';
 declare module 'next-auth' {
   interface Session {
     address: string | undefined;
-    ksmAddress: string;
+    taoAddress: string;
     freeBalance: BN;
   }
 
   interface User {
     id: string;
-    ksmAddress: string;
+    taoAddress: string;
     freeBalance: BN;
   }
 
@@ -88,24 +88,22 @@ export const authOptions: NextAuthOptions = {
           }
 
           // verify the account has the defined token
-          const wsProvider = new WsProvider(
-            process.env.RPC_ENDPOINT ?? 'wss://kusama-rpc.dwellir.com',
-          );
+          const wsProvider = new WsProvider(process.env.RPC_ENDPOINT);
           const api = await ApiPromise.create({ provider: wsProvider });
           await api.isReady;
 
           if (credentials?.address) {
-            const ksmAddress = encodeAddress(credentials.address, 2);
+            const taoAddress = encodeAddress(credentials.address, 2);
             // highlight-start
-            const accountInfo = await api.query.system.account(ksmAddress);
+            const accountInfo = await api.query.system.account(taoAddress);
 
-            if (accountInfo.data.free.gt(new BN(1_000_000_000_000))) {
-              // if the user has a free balance > 1 KSM, we let them in
+            if (accountInfo.data.free.gt(new BN(1_000_000_000))) {
+              // if the user has a free balance > 1 TAO, we let them in
               return {
                 id: credentials.address,
                 name: credentials.name,
                 freeBalance: accountInfo.data.free,
-                ksmAddress,
+                taoAddress,
               };
             } else {
               return Promise.reject(new Error('🚫 The gate is closed for you'));
@@ -139,7 +137,7 @@ export const authOptions: NextAuthOptions = {
 
       session.address = token.sub;
       if (session.address) {
-        session.ksmAddress = encodeAddress(session.address, 2);
+        session.taoAddress = encodeAddress(session.address, 2);
       }
 
       // as we already queried it, we can add whatever token to the session,
